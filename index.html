@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>韓国語 学習計画</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="韓国語計画">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,sans-serif;background:#fafafa;color:#1a1a2e}
+header{background:#1a1a2e;color:white;padding:20px 16px;border-bottom:3px solid #E8005A}
+.badge{background:#E8005A;color:white;font-size:11px;font-weight:700;padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:8px}
+header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+header p{font-size:12px;color:#aaa;line-height:1.5}
+.controls{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;background:white;border-bottom:1px solid #eee}
+.filter-btn{border:1.5px solid #ddd;background:white;padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit}
+.filter-btn.active{background:#E8005A;border-color:#E8005A;color:white}
+.save-btn{border:1.5px solid #ddd;background:white;padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;display:inline-block}
+.save-btn:hover{background:#f5f5f5}
+.legend{display:flex;gap:10px;flex-wrap:wrap;padding:10px 16px;font-size:11px;color:#666;background:white;border-bottom:1px solid #eee}
+.legend-item{display:flex;align-items:center;gap:4px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.summary{display:flex;gap:10px;padding:12px 16px;overflow-x:auto}
+.stat{background:white;border:1px solid #eee;border-radius:8px;padding:10px 14px;min-width:100px;flex-shrink:0}
+.stat-val{font-size:24px;font-weight:700;color:#E8005A}
+.stat-label{font-size:10px;color:#999;margin-top:2px}
+.table-wrap{overflow-x:auto;padding-bottom:40px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:340px}
+th{background:#1a1a2e;color:white;padding:8px 10px;text-align:left;font-size:11px;font-weight:500}
+th:first-child{width:48px;text-align:center}
+th:nth-child(3){width:52px}
+th:nth-child(4){width:130px}
+td{padding:9px 10px;border-bottom:1px solid #eee;vertical-align:middle}
+.day-cell{text-align:center;font-weight:700;font-size:14px}
+.tag-cell{line-height:1.8}
+.total-cell{font-size:12px;color:#999;white-space:nowrap}
+.date-cell input{border:1px solid #ddd;border-radius:4px;padding:3px 4px;font-size:12px;width:126px;color:#444;font-family:inherit}
+.tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:700;color:white;margin:2px 3px 2px 0}
+.week-sep td{background:#f0f0f5;font-weight:700;font-size:11px;color:#888;letter-spacing:0.08em;padding:6px 10px}
+tr.rest-row{opacity:0.65}
+tr.done-row td{opacity:0.35}
+tr.done-row .day-cell{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">5級 / 4級</div>
+  <h1>韓国語 忘却曲線 学習計画</h1>
+  <p>全77項目（5級35日＋4級42日）<br>復習間隔：1日後・7日後・16日後・35日後／1日最大2コマ</p>
+</header>
+
+<div class="summary">
+  <div class="stat"><div class="stat-val">77</div><div class="stat-label">総項目数</div></div>
+  <div class="stat"><div class="stat-val">209</div><div class="stat-label">総学習日数</div></div>
+  <div class="stat"><div class="stat-val" id="stat-done" style="color:#27AE60">0</div><div class="stat-label">完了日 ✓</div></div>
+</div>
+
+<div class="controls">
+  <button class="save-btn" onclick="showSaveModal()">💾 保存 / 読込</button>
+  <div style="width:1px;background:#eee;margin:0 4px"></div>
+  <button class="filter-btn active" onclick="filter('all',this)">すべて</button>
+  <button class="filter-btn" onclick="filter('new',this)">新規あり</button>
+  <button class="filter-btn" onclick="filter('rest',this)">復習のみ</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="dot" style="background:#E8005A"></span>新規</div>
+  <div class="legend-item"><span class="dot" style="background:#FF6FAE"></span>復習①（1日後）</div>
+  <div class="legend-item"><span class="dot" style="background:#9B59B6"></span>復習②（7日後）</div>
+  <div class="legend-item"><span class="dot" style="background:#3498DB"></span>復習③（16日後）</div>
+  <div class="legend-item"><span class="dot" style="background:#27AE60"></span>復習④（35日後）</div>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>Day</th><th>やること</th><th>合計</th><th>実施日</th>
+  </tr></thead>
+  <tbody>
+<tr class="week-sep"><td colspan="4">第1週</td></tr>
+<tr data-type="new" data-day="1">
+      <td class="day-cell">1</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（1日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(1,this)"></td>
+    </tr>
+<tr data-type="new" data-day="2">
+      <td class="day-cell">2</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（2日目）</span><span class="tag" style="background:#FF6FAE">復習①（1日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(2,this)"></td>
+    </tr>
+<tr data-type="new" data-day="3">
+      <td class="day-cell">3</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（3日目）</span><span class="tag" style="background:#FF6FAE">復習①（2日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(3,this)"></td>
+    </tr>
+<tr data-type="new" data-day="4">
+      <td class="day-cell">4</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（4日目）</span><span class="tag" style="background:#FF6FAE">復習①（3日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(4,this)"></td>
+    </tr>
+<tr data-type="new" data-day="5">
+      <td class="day-cell">5</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（5日目）</span><span class="tag" style="background:#FF6FAE">復習①（4日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(5,this)"></td>
+    </tr>
+<tr data-type="new" data-day="6">
+      <td class="day-cell">6</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（6日目）</span><span class="tag" style="background:#FF6FAE">復習①（5日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(6,this)"></td>
+    </tr>
+<tr data-type="new" data-day="7">
+      <td class="day-cell">7</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（7日目）</span><span class="tag" style="background:#FF6FAE">復習①（6日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(7,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第2週</td></tr>
+<tr data-type="rest" data-day="8">
+      <td class="day-cell">8</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（1日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（7日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(8,this)"></td>
+    </tr>
+<tr data-type="new" data-day="9">
+      <td class="day-cell">9</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（9日目）</span><span class="tag" style="background:#9B59B6">復習②（2日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(9,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="10">
+      <td class="day-cell">10</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（3日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（9日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(10,this)"></td>
+    </tr>
+<tr data-type="new" data-day="11">
+      <td class="day-cell">11</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（11日目）</span><span class="tag" style="background:#9B59B6">復習②（4日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(11,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="12">
+      <td class="day-cell">12</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（5日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（11日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(12,this)"></td>
+    </tr>
+<tr data-type="new" data-day="13">
+      <td class="day-cell">13</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（13日目）</span><span class="tag" style="background:#9B59B6">復習②（6日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(13,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="14">
+      <td class="day-cell">14</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（7日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（13日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(14,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第3週</td></tr>
+<tr data-type="new" data-day="15">
+      <td class="day-cell">15</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（15日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(15,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="16">
+      <td class="day-cell">16</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（9日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（15日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(16,this)"></td>
+    </tr>
+<tr data-type="new" data-day="17">
+      <td class="day-cell">17</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（17日目）</span><span class="tag" style="background:#3498DB">復習③（1日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(17,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="18">
+      <td class="day-cell">18</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（2日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（11日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(18,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="19">
+      <td class="day-cell">19</td>
+      <td class="tag-cell"><span class="tag" style="background:#FF6FAE">復習①（17日目の内容）</span><span class="tag" style="background:#3498DB">復習③（3日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(19,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="20">
+      <td class="day-cell">20</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（4日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（13日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(20,this)"></td>
+    </tr>
+<tr data-type="new" data-day="21">
+      <td class="day-cell">21</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（21日目）</span><span class="tag" style="background:#3498DB">復習③（5日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(21,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第4週</td></tr>
+<tr data-type="rest" data-day="22">
+      <td class="day-cell">22</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（6日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（15日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(22,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="23">
+      <td class="day-cell">23</td>
+      <td class="tag-cell"><span class="tag" style="background:#FF6FAE">復習①（21日目の内容）</span><span class="tag" style="background:#3498DB">復習③（7日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(23,this)"></td>
+    </tr>
+<tr data-type="new" data-day="24">
+      <td class="day-cell">24</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（24日目）</span><span class="tag" style="background:#9B59B6">復習②（17日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(24,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="25">
+      <td class="day-cell">25</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（9日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（24日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(25,this)"></td>
+    </tr>
+<tr data-type="new" data-day="26">
+      <td class="day-cell">26</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（26日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(26,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="27">
+      <td class="day-cell">27</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（11日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（26日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(27,this)"></td>
+    </tr>
+<tr data-type="new" data-day="28">
+      <td class="day-cell">28</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（28日目）</span><span class="tag" style="background:#9B59B6">復習②（21日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(28,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第5週</td></tr>
+<tr data-type="rest" data-day="29">
+      <td class="day-cell">29</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（13日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（28日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(29,this)"></td>
+    </tr>
+<tr data-type="new" data-day="30">
+      <td class="day-cell">30</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（30日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(30,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="31">
+      <td class="day-cell">31</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（15日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（24日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(31,this)"></td>
+    </tr>
+<tr data-type="new" data-day="32">
+      <td class="day-cell">32</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（32日目）</span><span class="tag" style="background:#FF6FAE">復習①（30日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(32,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="33">
+      <td class="day-cell">33</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（17日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（26日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(33,this)"></td>
+    </tr>
+<tr data-type="new" data-day="34">
+      <td class="day-cell">34</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（34日目）</span><span class="tag" style="background:#FF6FAE">復習①（32日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(34,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="35">
+      <td class="day-cell">35</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（28日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（34日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(35,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第6週</td></tr>
+<tr data-type="new" data-day="36">
+      <td class="day-cell">36</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（36日目）</span><span class="tag" style="background:#27AE60">復習④（1日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(36,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="37">
+      <td class="day-cell">37</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（2日目の内容）</span><span class="tag" style="background:#3498DB">復習③（21日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(37,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="38">
+      <td class="day-cell">38</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（30日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（36日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(38,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="39">
+      <td class="day-cell">39</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（3日目の内容）</span><span class="tag" style="background:#27AE60">復習④（4日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(39,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="40">
+      <td class="day-cell">40</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（32日目の内容）</span><span class="tag" style="background:#27AE60">復習④（5日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(40,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="41">
+      <td class="day-cell">41</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（24日目の内容）</span><span class="tag" style="background:#27AE60">復習④（6日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(41,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="42">
+      <td class="day-cell">42</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（34日目の内容）</span><span class="tag" style="background:#27AE60">復習④（7日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(42,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第7週</td></tr>
+<tr data-type="rest" data-day="43">
+      <td class="day-cell">43</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（26日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（36日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(43,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="44">
+      <td class="day-cell">44</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（9日目の内容）</span><span class="tag" style="background:#3498DB">復習③（28日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(44,this)"></td>
+    </tr>
+<tr data-type="new" data-day="45">
+      <td class="day-cell">45</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（45日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(45,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="46">
+      <td class="day-cell">46</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（11日目の内容）</span><span class="tag" style="background:#3498DB">復習③（30日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(46,this)"></td>
+    </tr>
+<tr data-type="new" data-day="47">
+      <td class="day-cell">47</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（47日目）</span><span class="tag" style="background:#FF6FAE">復習①（45日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(47,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="48">
+      <td class="day-cell">48</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（13日目の内容）</span><span class="tag" style="background:#3498DB">復習③（32日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(48,this)"></td>
+    </tr>
+<tr data-type="new" data-day="49">
+      <td class="day-cell">49</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（49日目）</span><span class="tag" style="background:#FF6FAE">復習①（47日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(49,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第8週</td></tr>
+<tr data-type="rest" data-day="50">
+      <td class="day-cell">50</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（15日目の内容）</span><span class="tag" style="background:#3498DB">復習③（34日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(50,this)"></td>
+    </tr>
+<tr data-type="new" data-day="51">
+      <td class="day-cell">51</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（51日目）</span><span class="tag" style="background:#FF6FAE">復習①（49日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(51,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="52">
+      <td class="day-cell">52</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（17日目の内容）</span><span class="tag" style="background:#3498DB">復習③（36日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(52,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="53">
+      <td class="day-cell">53</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（45日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（51日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(53,this)"></td>
+    </tr>
+<tr data-type="new" data-day="54">
+      <td class="day-cell">54</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（54日目）</span><span class="tag" style="background:#9B59B6">復習②（47日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(54,this)"></td>
+    </tr>
+<tr data-type="new" data-day="55">
+      <td class="day-cell">55</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（55日目）</span><span class="tag" style="background:#FF6FAE">復習①（54日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(55,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="56">
+      <td class="day-cell">56</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（21日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（49日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(56,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第9週</td></tr>
+<tr data-type="new" data-day="57">
+      <td class="day-cell">57</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（57日目）</span><span class="tag" style="background:#FF6FAE">復習①（55日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(57,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="58">
+      <td class="day-cell">58</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（51日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（57日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(58,this)"></td>
+    </tr>
+<tr data-type="new" data-day="59">
+      <td class="day-cell">59</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（59日目）</span><span class="tag" style="background:#27AE60">復習④（24日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(59,this)"></td>
+    </tr>
+<tr data-type="new" data-day="60">
+      <td class="day-cell">60</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（60日目）</span><span class="tag" style="background:#FF6FAE">復習①（59日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(60,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="61">
+      <td class="day-cell">61</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（26日目の内容）</span><span class="tag" style="background:#3498DB">復習③（45日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(61,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="62">
+      <td class="day-cell">62</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（54日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（60日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(62,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="63">
+      <td class="day-cell">63</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（55日目の内容）</span><span class="tag" style="background:#27AE60">復習④（28日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(63,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第10週</td></tr>
+<tr data-type="rest" data-day="64">
+      <td class="day-cell">64</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（47日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（57日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(64,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="65">
+      <td class="day-cell">65</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（30日目の内容）</span><span class="tag" style="background:#3498DB">復習③（49日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(65,this)"></td>
+    </tr>
+<tr data-type="new" data-day="66">
+      <td class="day-cell">66</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（66日目）</span><span class="tag" style="background:#9B59B6">復習②（59日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(66,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="67">
+      <td class="day-cell">67</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（32日目の内容）</span><span class="tag" style="background:#3498DB">復習③（51日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(67,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="68">
+      <td class="day-cell">68</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（60日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（66日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(68,this)"></td>
+    </tr>
+<tr data-type="new" data-day="69">
+      <td class="day-cell">69</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（69日目）</span><span class="tag" style="background:#27AE60">復習④（34日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(69,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="70">
+      <td class="day-cell">70</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（54日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（69日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(70,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第11週</td></tr>
+<tr data-type="rest" data-day="71">
+      <td class="day-cell">71</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（36日目の内容）</span><span class="tag" style="background:#3498DB">復習③（55日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(71,this)"></td>
+    </tr>
+<tr data-type="new" data-day="72">
+      <td class="day-cell">72</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（72日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(72,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="73">
+      <td class="day-cell">73</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（57日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（66日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(73,this)"></td>
+    </tr>
+<tr data-type="new" data-day="74">
+      <td class="day-cell">74</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（74日目）</span><span class="tag" style="background:#FF6FAE">復習①（72日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(74,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="75">
+      <td class="day-cell">75</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（59日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（74日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(75,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="76">
+      <td class="day-cell">76</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（60日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（69日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(76,this)"></td>
+    </tr>
+<tr data-type="new" data-day="77">
+      <td class="day-cell">77</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（77日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(77,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第12週</td></tr>
+<tr data-type="new" data-day="78">
+      <td class="day-cell">78</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（78日目）</span><span class="tag" style="background:#FF6FAE">復習①（77日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(78,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="79">
+      <td class="day-cell">79</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（72日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（78日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(79,this)"></td>
+    </tr>
+<tr data-type="new" data-day="80">
+      <td class="day-cell">80</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（80日目）</span><span class="tag" style="background:#27AE60">復習④（45日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(80,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="81">
+      <td class="day-cell">81</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（74日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（80日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(81,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="82">
+      <td class="day-cell">82</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（47日目の内容）</span><span class="tag" style="background:#3498DB">復習③（66日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(82,this)"></td>
+    </tr>
+<tr data-type="new" data-day="83">
+      <td class="day-cell">83</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（83日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(83,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="84">
+      <td class="day-cell">84</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（49日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（77日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(84,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第13週</td></tr>
+<tr data-type="rest" data-day="85">
+      <td class="day-cell">85</td>
+      <td class="tag-cell"><span class="tag" style="background:#FF6FAE">復習①（83日目の内容）</span><span class="tag" style="background:#3498DB">復習③（69日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(85,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="86">
+      <td class="day-cell">86</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（78日目の内容）</span><span class="tag" style="background:#27AE60">復習④（51日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(86,this)"></td>
+    </tr>
+<tr data-type="new" data-day="87">
+      <td class="day-cell">87</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（87日目）</span><span class="tag" style="background:#9B59B6">復習②（80日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(87,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="88">
+      <td class="day-cell">88</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（72日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（87日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(88,this)"></td>
+    </tr>
+<tr data-type="new" data-day="89">
+      <td class="day-cell">89</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（89日目）</span><span class="tag" style="background:#27AE60">復習④（54日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(89,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="90">
+      <td class="day-cell">90</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（55日目の内容）</span><span class="tag" style="background:#3498DB">復習③（74日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(90,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="91">
+      <td class="day-cell">91</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（83日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（89日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(91,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第14週</td></tr>
+<tr data-type="new" data-day="92">
+      <td class="day-cell">92</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（92日目）</span><span class="tag" style="background:#27AE60">復習④（57日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(92,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="93">
+      <td class="day-cell">93</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（77日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（92日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(93,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="94">
+      <td class="day-cell">94</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（59日目の内容）</span><span class="tag" style="background:#3498DB">復習③（78日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(94,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="95">
+      <td class="day-cell">95</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（87日目の内容）</span><span class="tag" style="background:#27AE60">復習④（60日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(95,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="96">
+      <td class="day-cell">96</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（80日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（89日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(96,this)"></td>
+    </tr>
+<tr data-type="new" data-day="97">
+      <td class="day-cell">97</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（97日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(97,this)"></td>
+    </tr>
+<tr data-type="new" data-day="98">
+      <td class="day-cell">98</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（98日目）</span><span class="tag" style="background:#FF6FAE">復習①（97日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(98,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第15週</td></tr>
+<tr data-type="rest" data-day="99">
+      <td class="day-cell">99</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（83日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（92日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(99,this)"></td>
+    </tr>
+<tr data-type="new" data-day="100">
+      <td class="day-cell">100</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（100日目）</span><span class="tag" style="background:#FF6FAE">復習①（98日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(100,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="101">
+      <td class="day-cell">101</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（66日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（100日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(101,this)"></td>
+    </tr>
+<tr data-type="new" data-day="102">
+      <td class="day-cell">102</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（102日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(102,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="103">
+      <td class="day-cell">103</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（87日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（102日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(103,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="104">
+      <td class="day-cell">104</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（69日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（97日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(104,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="105">
+      <td class="day-cell">105</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（89日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（98日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(105,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第16週</td></tr>
+<tr data-type="new" data-day="106">
+      <td class="day-cell">106</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（106日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(106,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="107">
+      <td class="day-cell">107</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（72日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（100日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(107,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="108">
+      <td class="day-cell">108</td>
+      <td class="tag-cell"><span class="tag" style="background:#FF6FAE">復習①（106日目の内容）</span><span class="tag" style="background:#3498DB">復習③（92日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(108,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="109">
+      <td class="day-cell">109</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（74日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（102日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(109,this)"></td>
+    </tr>
+<tr data-type="new" data-day="110">
+      <td class="day-cell">110</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（110日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(110,this)"></td>
+    </tr>
+<tr data-type="new" data-day="111">
+      <td class="day-cell">111</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（111日目）</span><span class="tag" style="background:#FF6FAE">復習①（110日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(111,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="112">
+      <td class="day-cell">112</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（77日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（111日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(112,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第17週</td></tr>
+<tr data-type="rest" data-day="113">
+      <td class="day-cell">113</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（78日目の内容）</span><span class="tag" style="background:#3498DB">復習③（97日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(113,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="114">
+      <td class="day-cell">114</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（106日目の内容）</span><span class="tag" style="background:#3498DB">復習③（98日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(114,this)"></td>
+    </tr>
+<tr data-type="new" data-day="115">
+      <td class="day-cell">115</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（115日目）</span><span class="tag" style="background:#27AE60">復習④（80日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(115,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="116">
+      <td class="day-cell">116</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（100日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（115日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(116,this)"></td>
+    </tr>
+<tr data-type="new" data-day="117">
+      <td class="day-cell">117</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（117日目）</span><span class="tag" style="background:#9B59B6">復習②（110日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(117,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="118">
+      <td class="day-cell">118</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（83日目の内容）</span><span class="tag" style="background:#3498DB">復習③（102日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(118,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="119">
+      <td class="day-cell">119</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（111日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（117日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(119,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第18週</td></tr>
+<tr data-type="new" data-day="120">
+      <td class="day-cell">120</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（120日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(120,this)"></td>
+    </tr>
+<tr data-type="new" data-day="121">
+      <td class="day-cell">121</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（121日目）</span><span class="tag" style="background:#FF6FAE">復習①（120日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(121,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="122">
+      <td class="day-cell">122</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（87日目の内容）</span><span class="tag" style="background:#3498DB">復習③（106日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(122,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="123">
+      <td class="day-cell">123</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（115日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（121日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(123,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="124">
+      <td class="day-cell">124</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（89日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（117日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(124,this)"></td>
+    </tr>
+<tr data-type="new" data-day="125">
+      <td class="day-cell">125</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（125日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(125,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="126">
+      <td class="day-cell">126</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（110日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（125日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(126,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第19週</td></tr>
+<tr data-type="rest" data-day="127">
+      <td class="day-cell">127</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（92日目の内容）</span><span class="tag" style="background:#3498DB">復習③（111日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(127,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="128">
+      <td class="day-cell">128</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（120日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（121日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(128,this)"></td>
+    </tr>
+<tr data-type="new" data-day="129">
+      <td class="day-cell">129</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（129日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(129,this)"></td>
+    </tr>
+<tr data-type="new" data-day="130">
+      <td class="day-cell">130</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（130日目）</span><span class="tag" style="background:#FF6FAE">復習①（129日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(130,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="131">
+      <td class="day-cell">131</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（115日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（130日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(131,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="132">
+      <td class="day-cell">132</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（97日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（125日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(132,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="133">
+      <td class="day-cell">133</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（98日目の内容）</span><span class="tag" style="background:#3498DB">復習③（117日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(133,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第20週</td></tr>
+<tr data-type="new" data-day="134">
+      <td class="day-cell">134</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（134日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(134,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="135">
+      <td class="day-cell">135</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（100日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（134日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(135,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="136">
+      <td class="day-cell">136</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（120日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（129日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(136,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="137">
+      <td class="day-cell">137</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（102日目の内容）</span><span class="tag" style="background:#3498DB">復習③（121日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(137,this)"></td>
+    </tr>
+<tr data-type="new" data-day="138">
+      <td class="day-cell">138</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（138日目）</span><span class="tag" style="background:#9B59B6">復習②（130日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(138,this)"></td>
+    </tr>
+<tr data-type="new" data-day="139">
+      <td class="day-cell">139</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（139日目）</span><span class="tag" style="background:#FF6FAE">復習①（138日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(139,this)"></td>
+    </tr>
+<tr data-type="new" data-day="140">
+      <td class="day-cell">140</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（140日目）</span><span class="tag" style="background:#FF6FAE">復習①（139日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(140,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第21週</td></tr>
+<tr data-type="rest" data-day="141">
+      <td class="day-cell">141</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（106日目の内容）</span><span class="tag" style="background:#3498DB">復習③（125日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(141,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="142">
+      <td class="day-cell">142</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（134日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（140日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(142,this)"></td>
+    </tr>
+<tr data-type="new" data-day="143">
+      <td class="day-cell">143</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（143日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(143,this)"></td>
+    </tr>
+<tr data-type="new" data-day="144">
+      <td class="day-cell">144</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（144日目）</span><span class="tag" style="background:#FF6FAE">復習①（143日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(144,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="145">
+      <td class="day-cell">145</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（110日目の内容）</span><span class="tag" style="background:#3498DB">復習③（129日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(145,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="146">
+      <td class="day-cell">146</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（138日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（144日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(146,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="147">
+      <td class="day-cell">147</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（111日目の内容）</span><span class="tag" style="background:#3498DB">復習③（130日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(147,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第22週</td></tr>
+<tr data-type="rest" data-day="148">
+      <td class="day-cell">148</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（139日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（140日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(148,this)"></td>
+    </tr>
+<tr data-type="new" data-day="149">
+      <td class="day-cell">149</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（149日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(149,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="150">
+      <td class="day-cell">150</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（115日目の内容）</span><span class="tag" style="background:#3498DB">復習③（134日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(150,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="151">
+      <td class="day-cell">151</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（143日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（149日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(151,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="152">
+      <td class="day-cell">152</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（144日目の内容）</span><span class="tag" style="background:#27AE60">復習④（117日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(152,this)"></td>
+    </tr>
+<tr data-type="new" data-day="153">
+      <td class="day-cell">153</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（153日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(153,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="154">
+      <td class="day-cell">154</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（138日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（153日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(154,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第23週</td></tr>
+<tr data-type="rest" data-day="155">
+      <td class="day-cell">155</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（120日目の内容）</span><span class="tag" style="background:#3498DB">復習③（139日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(155,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="156">
+      <td class="day-cell">156</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（121日目の内容）</span><span class="tag" style="background:#3498DB">復習③（140日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(156,this)"></td>
+    </tr>
+<tr data-type="new" data-day="157">
+      <td class="day-cell">157</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（157日目）</span><span class="tag" style="background:#9B59B6">復習②（149日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(157,this)"></td>
+    </tr>
+<tr data-type="new" data-day="158">
+      <td class="day-cell">158</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（158日目）</span><span class="tag" style="background:#FF6FAE">復習①（157日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(158,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="159">
+      <td class="day-cell">159</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（143日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（158日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(159,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="160">
+      <td class="day-cell">160</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（125日目の内容）</span><span class="tag" style="background:#3498DB">復習③（144日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(160,this)"></td>
+    </tr>
+<tr data-type="new" data-day="161">
+      <td class="day-cell">161</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（161日目）</span><span class="tag" style="background:#9B59B6">復習②（153日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(161,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第24週</td></tr>
+<tr data-type="new" data-day="162">
+      <td class="day-cell">162</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（162日目）</span><span class="tag" style="background:#FF6FAE">復習①（161日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(162,this)"></td>
+    </tr>
+<tr data-type="new" data-day="163">
+      <td class="day-cell">163</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（163日目）</span><span class="tag" style="background:#FF6FAE">復習①（162日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(163,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="164">
+      <td class="day-cell">164</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（129日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（157日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(164,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="165">
+      <td class="day-cell">165</td>
+      <td class="tag-cell"><span class="tag" style="background:#FF6FAE">復習①（163日目の内容）</span><span class="tag" style="background:#27AE60">復習④（130日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(165,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="166">
+      <td class="day-cell">166</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（149日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（158日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(166,this)"></td>
+    </tr>
+<tr data-type="new" data-day="167">
+      <td class="day-cell">167</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（167日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(167,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="168">
+      <td class="day-cell">168</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（161日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（167日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(168,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第25週</td></tr>
+<tr data-type="rest" data-day="169">
+      <td class="day-cell">169</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（134日目の内容）</span><span class="tag" style="background:#3498DB">復習③（153日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(169,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="170">
+      <td class="day-cell">170</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（162日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（163日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(170,this)"></td>
+    </tr>
+<tr data-type="new" data-day="171">
+      <td class="day-cell">171</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（171日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(171,this)"></td>
+    </tr>
+<tr data-type="new" data-day="172">
+      <td class="day-cell">172</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（172日目）</span><span class="tag" style="background:#FF6FAE">復習①（171日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(172,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="173">
+      <td class="day-cell">173</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（138日目の内容）</span><span class="tag" style="background:#3498DB">復習③（157日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(173,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="174">
+      <td class="day-cell">174</td>
+      <td class="tag-cell"><span class="tag" style="background:#FF6FAE">復習①（172日目の内容）</span><span class="tag" style="background:#27AE60">復習④（139日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(174,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="175">
+      <td class="day-cell">175</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（158日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（167日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(175,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第26週</td></tr>
+<tr data-type="new" data-day="176">
+      <td class="day-cell">176</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（176日目）</span><span class="tag" style="background:#27AE60">復習④（140日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(176,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="177">
+      <td class="day-cell">177</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（161日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（176日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(177,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="178">
+      <td class="day-cell">178</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（143日目の内容）</span><span class="tag" style="background:#3498DB">復習③（162日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(178,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="179">
+      <td class="day-cell">179</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（171日目の内容）</span><span class="tag" style="background:#27AE60">復習④（144日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(179,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="180">
+      <td class="day-cell">180</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（163日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（172日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(180,this)"></td>
+    </tr>
+<tr data-type="new" data-day="181">
+      <td class="day-cell">181</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（181日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(181,this)"></td>
+    </tr>
+<tr data-type="new" data-day="182">
+      <td class="day-cell">182</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（182日目）</span><span class="tag" style="background:#FF6FAE">復習①（181日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(182,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第27週</td></tr>
+<tr data-type="rest" data-day="183">
+      <td class="day-cell">183</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（167日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（176日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(183,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="184">
+      <td class="day-cell">184</td>
+      <td class="tag-cell"><span class="tag" style="background:#FF6FAE">復習①（182日目の内容）</span><span class="tag" style="background:#27AE60">復習④（149日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(184,this)"></td>
+    </tr>
+<tr data-type="new" data-day="185">
+      <td class="day-cell">185</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（185日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(185,this)"></td>
+    </tr>
+<tr data-type="new" data-day="186">
+      <td class="day-cell">186</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（186日目）</span><span class="tag" style="background:#FF6FAE">復習①（185日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(186,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="187">
+      <td class="day-cell">187</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（171日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（186日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(187,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="188">
+      <td class="day-cell">188</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（153日目の内容）</span><span class="tag" style="background:#3498DB">復習③（172日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(188,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="189">
+      <td class="day-cell">189</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（181日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（182日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(189,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第28週</td></tr>
+<tr data-type="new" data-day="190">
+      <td class="day-cell">190</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（190日目）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(190,this)"></td>
+    </tr>
+<tr data-type="new" data-day="191">
+      <td class="day-cell">191</td>
+      <td class="tag-cell"><span class="tag" style="background:#E8005A">新規（191日目）</span><span class="tag" style="background:#FF6FAE">復習①（190日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(191,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="192">
+      <td class="day-cell">192</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（157日目の内容）</span><span class="tag" style="background:#3498DB">復習③（176日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(192,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="193">
+      <td class="day-cell">193</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（158日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（185日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(193,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="194">
+      <td class="day-cell">194</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（186日目の内容）</span><span class="tag" style="background:#FF6FAE">復習①（191日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(194,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="196">
+      <td class="day-cell">196</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（161日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(196,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第29週</td></tr>
+<tr data-type="rest" data-day="197">
+      <td class="day-cell">197</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（162日目の内容）</span><span class="tag" style="background:#3498DB">復習③（181日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(197,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="198">
+      <td class="day-cell">198</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（163日目の内容）</span><span class="tag" style="background:#3498DB">復習③（182日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(198,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="199">
+      <td class="day-cell">199</td>
+      <td class="tag-cell"><span class="tag" style="background:#9B59B6">復習②（190日目の内容）</span><span class="tag" style="background:#9B59B6">復習②（191日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(199,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="201">
+      <td class="day-cell">201</td>
+      <td class="tag-cell"><span class="tag" style="background:#3498DB">復習③（185日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(201,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="202">
+      <td class="day-cell">202</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（167日目の内容）</span><span class="tag" style="background:#3498DB">復習③（186日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(202,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第30週</td></tr>
+<tr data-type="rest" data-day="206">
+      <td class="day-cell">206</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（171日目の内容）</span><span class="tag" style="background:#3498DB">復習③（190日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(206,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="207">
+      <td class="day-cell">207</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（172日目の内容）</span><span class="tag" style="background:#3498DB">復習③（191日目の内容）</span></td>
+      <td class="total-cell">2コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(207,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第31週</td></tr>
+<tr data-type="rest" data-day="211">
+      <td class="day-cell">211</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（176日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(211,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="216">
+      <td class="day-cell">216</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（181日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(216,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="217">
+      <td class="day-cell">217</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（182日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(217,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第32週</td></tr>
+<tr data-type="rest" data-day="220">
+      <td class="day-cell">220</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（185日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(220,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="221">
+      <td class="day-cell">221</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（186日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(221,this)"></td>
+    </tr>
+<tr class="week-sep"><td colspan="4">第33週</td></tr>
+<tr data-type="rest" data-day="225">
+      <td class="day-cell">225</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（190日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(225,this)"></td>
+    </tr>
+<tr data-type="rest" data-day="226">
+      <td class="day-cell">226</td>
+      <td class="tag-cell"><span class="tag" style="background:#27AE60">復習④（191日目の内容）</span></td>
+      <td class="total-cell">1コマ</td>
+      <td class="date-cell"><input type="date" onchange="saveDate(226,this)"></td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+
+<script>
+const STORAGE_KEY = 'korean-study-plan-v1';
+const state = {};
+
+function saveToStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function updateStats() {
+  const done = Object.keys(state).filter(k => k.startsWith('date_') && state[k]).length;
+  document.getElementById('stat-done').textContent = done;
+  document.querySelectorAll('tbody tr[data-day]').forEach(tr => {
+    if (state['date_' + tr.dataset.day]) tr.classList.add('done-row');
+    else tr.classList.remove('done-row');
+  });
+}
+
+function loadFromStorage() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    Object.assign(state, data);
+    Object.keys(data).forEach(key => {
+      const m = key.match(/date_(\d+)/);
+      if (m) {
+        const inp = document.querySelector('tr[data-day="' + m[1] + '"] input[type="date"]');
+        if (inp) inp.value = data[key];
+      }
+    });
+    updateStats();
+  } catch(e) {}
+}
+
+function showSaveModal() {
+  document.getElementById('save-json').value = JSON.stringify(state);
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('load-json').value = '';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function copyJson() {
+  const ta = document.getElementById('save-json');
+  ta.select();
+  document.execCommand('copy');
+  document.getElementById('copy-btn').textContent = 'コピーしました！';
+  setTimeout(() => document.getElementById('copy-btn').textContent = 'コピー', 1500);
+}
+
+function loadJson() {
+  try {
+    const data = JSON.parse(document.getElementById('load-json').value);
+    Object.assign(state, data);
+    Object.keys(data).forEach(key => {
+      const m = key.match(/date_(\d+)/);
+      if (m) {
+        const inp = document.querySelector('tr[data-day="' + m[1] + '"] input[type="date"]');
+        if (inp) inp.value = data[key];
+      }
+    });
+    saveToStorage();
+    updateStats();
+    closeModal();
+    alert('読み込みました');
+  } catch(e) { alert('データが正しくありません'); }
+}
+
+function filter(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('tbody tr[data-day]').forEach(tr => {
+    if (type === 'all') tr.style.display = '';
+    else if (type === 'new') tr.style.display = tr.dataset.type === 'new' ? '' : 'none';
+    else if (type === 'rest') tr.style.display = tr.dataset.type === 'rest' ? '' : 'none';
+  });
+}
+
+function saveDate(day, input) {
+  if (input.value) state['date_' + day] = input.value;
+  else delete state['date_' + day];
+  saveToStorage();
+  updateStats();
+}
+
+window.addEventListener('DOMContentLoaded', loadFromStorage);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+<!-- モーダル -->
+<div id="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:white;border-radius:12px;padding:20px;width:100%;max-width:480px">
+    <h3 style="font-size:15px;margin-bottom:12px;color:#1a1a2e">💾 保存 / 📂 読込</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:8px">▼ 保存：下のテキストをコピーしてメモ等に保存</p>
+    <textarea id="save-json" readonly style="width:100%;height:80px;font-size:11px;border:1px solid #ddd;border-radius:6px;padding:8px;resize:none;font-family:monospace"></textarea>
+    <button id="copy-btn" onclick="copyJson()" style="margin-top:6px;width:100%;padding:8px;background:#E8005A;color:white;border:none;border-radius:6px;font-size:13px;cursor:pointer">コピー</button>
+    <p style="font-size:12px;color:#888;margin:14px 0 8px">▼ 読込：保存したテキストを貼り付けて読込</p>
+    <textarea id="load-json" placeholder="ここに貼り付け..." style="width:100%;height:80px;font-size:11px;border:1px solid #ddd;border-radius:6px;padding:8px;resize:none;font-family:monospace"></textarea>
+    <button onclick="loadJson()" style="margin-top:6px;width:100%;padding:8px;background:#1a1a2e;color:white;border:none;border-radius:6px;font-size:13px;cursor:pointer">読み込む</button>
+    <button onclick="closeModal()" style="margin-top:8px;width:100%;padding:8px;background:white;color:#888;border:1px solid #ddd;border-radius:6px;font-size:13px;cursor:pointer">閉じる</button>
+  </div>
+</div>
+</body>
+</html>

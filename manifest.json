@@ -1,0 +1,16 @@
+{
+  "name": "韓国語 忘却曲線 学習計画",
+  "short_name": "韓国語計画",
+  "description": "5級・4級の忘却曲線学習計画",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%231a1a2e'/><text y='130' x='50%' font-size='100' text-anchor='middle' fill='%23E8005A'>한</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
